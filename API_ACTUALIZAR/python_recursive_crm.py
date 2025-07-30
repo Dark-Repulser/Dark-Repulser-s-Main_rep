@@ -3,10 +3,10 @@ import requests
 import json
 from datetime import datetime
 
-access_token = "1000.d9a6ec9e7dddf9668be1f7bcac0812c7.ac72907364870253e5f11fb8ce70d307"
-refresh_token = "1000.0b8233b62707b577fe16832434abc213.b66c40f4c700c262ce57fedb128d3f06"
-client_id = "1000.9KLJEBGO230LA4N7PDKFH9G9G69WXH"
-client_secret = "ccba688719aba106669ffd09fcfe1eb5ecd12e28c2"
+access_token = {VARIABLE DE ENTORNO}
+refresh_token = {VARIABLE DE ENTORNO}
+client_id = {VARIABLE DE ENTORNO}
+client_secret = {VARIABLE DE ENTORNO}
 
 # Función para refrescar el token de acceso
 def refresh_access_token():
