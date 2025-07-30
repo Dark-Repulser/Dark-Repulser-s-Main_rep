@@ -1,10 +1,10 @@
 import requests  # Librería para conectar con APIs
 import pandas as pd  # Nota: Corrige el import de pandas
 
-client_id = "1000.9KLJEBGO230LA4N7PDKFH9G9G69WXH" 
-client_secret = "ccba688719aba106669ffd09fcfe1eb5ecd12e28c2"  
-refresh_token = "1000.c62b54bfe905385d4a578caf49cfc18e.3960351f3036dc510de046c7d554c3b7"  
-access_token = "1000.c17691b7e5441afc9bd1df558cfe313b.95288ac7ea3958ceb8994722d6765559"  
+client_id = {VARIABLE DE ENTORNO} 
+client_secret = {VARIABLE DE ENTORNO}  
+refresh_token = {VARIABLE DE ENTORNO}  
+access_token = {VARIABLE DE ENTORNO}
 
 # Función para obtener un nuevo access token usando el refresh token
 def refresh_access_token():
