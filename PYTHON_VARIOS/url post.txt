@@ -1,0 +1,1 @@
+https://accounts.zoho.com/oauth/v2/auth?response_type=code&client_id=1000.92V4JIXVSDFU7O8AY0KF18OE32TCTS&scope=Desk.tickets.ALL,Desk.search.READ,Desk.settings.ALL,Desk.contacts.READ&redirect_uri=https://cun.edu.co/&access_type=offline
