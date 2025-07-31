@@ -1,0 +1,42 @@
+void schedule.borrar_registros()
+{
+// Definir el módulo CRM
+var_crmModule = "Egresados_filantropia";
+var_totalDeleted = 0;
+// Parámetros de paginación
+var_startPage = 1;
+var_pageSize = 200;
+var_numOfPages = 50;
+var_getNextPage = true;
+lst_pageLoop = "0,".repeat(var_numOfPages).toList(",");
+// Iterar por páginas
+for each index var_pageNumber in lst_pageLoop
+{
+	var_currentPage = var_startPage + var_pageNumber;
+	if(var_getNextPage)
+	{
+		// Obtener registros del CRM
+		crm_Records = zoho.crm.getRecords(var_crmModule,var_currentPage,var_pageSize);
+		var_recordCount = crm_Records.size();
+		// Si no hay más registros, detener el bucle
+		if(var_recordCount < var_pageSize)
+		{
+			var_getNextPage = false;
+		}
+		// Eliminar cada registro
+		for each  crm_Record in crm_Records
+		{
+			recordId = crm_Record.get("id");
+			// Obtener ID del registro
+			if(recordId != null)
+			{
+				deleteRecordMap = {"module":var_crmModule,"id":recordId};
+				deleteResp = zoho.crm.invokeConnector("crm.delete",deleteRecordMap);
+				info "Eliminado: " + recordId + " - Respuesta: " + deleteResp;
+				var_totalDeleted = var_totalDeleted + 1;
+			}
+		}
+	}
+}
+info "Se eliminaron un total de " + var_totalDeleted + " registros";
+}
