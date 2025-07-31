@@ -1,0 +1,293 @@
+map LeadProcess8(string nombre_campana, string apellidos, string campaign, string codigo_departamento, string content, string correo, string medium, string modalidad, string nivel_formacion, string nombre_programa, string nombres, string numero_documento, string periodo, string Nombre, string source, string telefono, string form_origen, string table, string gclid, string activo)
+{
+mp = Map();
+sixty = zoho.currenttime.subDay(90);
+///////
+//BUSQUEDA DE LA CAMPANA POR NOMBRE
+//////
+criteria = "(Name:equals:" + nombre_campana + ")";
+camp = zoho.crm.searchRecords("Campa_as_Mercadeo",criteria);
+info "Campaigns: " + camp;
+str_tel = "";
+info str_tel;
+telefono = telefono.getAlphaNumeric();
+if(telefono.startsWith("3"))
+{
+	str_tel = "+57" + telefono;
+}
+else if(!telefono.startsWith("+"))
+{
+	str_tel = "+" + telefono;
+}
+if(camp.size() > 0)
+{
+	campaign = camp.get(0);
+	camp_id = campaign.getJSON("id");
+	mp.put("Campaña",camp_id);
+}
+else
+{
+	if(table.containsIgnoreCase("inscripciones.cun.edu.co"))
+	{
+		table = "PAUTA";
+	}
+	else if(!table.containsIgnoreCase("inscripcion") && !table.containsIgnoreCase("META") && !table.containsIgnoreCase("EDUCA") && !table.containsIgnoreCase("TIKTOK"))
+	{
+		table = "ORGANICO";
+	}
+	///////
+	//CREACION DE LA CAMAPANA
+	//////
+	creatCamp = Map();
+	creatCamp.put("Name",nombre_campana);
+	creatCamp.put("Source",source);
+	creatCamp.put("Medium",medium);
+	creatCamp.put("Content",content);
+	creatCamp.put("Campaing",campaign);
+	creatCamp.put("Tipo_de_fuente",table);
+	try 
+	{
+		newCamp = zoho.crm.createRecord("Campa_as_Mercadeo",creatCamp);
+		camp_id = newCamp.getJSON("id");
+		mp.put("Campaña Nueva: ",newCamp);
+	}
+	catch (e)
+	{
+		camp_id = "";
+		mp.put("Campaña Nueva: ",e);
+	}
+}
+if(Nombre != null)
+{
+	//////
+	//BUSQUEDA DEL PROGRAMA POR NOMBRE
+	/////
+	try 
+	{
+		criteria2 = "(Product_Name:equals:" + Nombre + ")";
+		prog = zoho.crm.searchRecords("Products",criteria2);
+		info "Programas: " + prog;
+		if(prog.size() > 0)
+		{
+			program = prog.get(0);
+			program_id = program.getJSON("id");
+			mp.put("Programa",program_id);
+		}
+		else
+		{
+			program_id = "";
+		}
+	}
+	catch (e)
+	{
+		program_id = "";
+	}
+}
+criteria3 = "(Correo_electr_nico_personal:equals:" + correo + ")";
+contacts = zoho.crm.searchRecords("Contacts",criteria3);
+info "Interesado: " + contacts;
+if(contacts.size() > 0)
+{
+	contact = contacts.get(0);
+	contact_id = contact.getJSON("id");
+	cont_creat = contact.getJSON("Created_Time");
+	cont_mp = Map();
+	cont_mp.put("First_Name",nombres);
+	//cont_mp.put("Owner",4402173000315605001);
+	cont_mp.put("Last_Name",apellidos);
+	cont_mp.put("N_mero_de_identificaci_n1",numero_documento);
+	cont_mp.put("Ciudad_residencia",codigo_departamento);
+	cont_mp.put("Programa_de_interes",program_id);
+	cont_mp.put("Ultimo_nivel_de_escolaridad",nivel_formacion);
+	cont_mp.put("Modalidad",modalidad);
+	cont_mp.put("Periodo",periodo);
+	if(periodo.containsIgnoreCase("C") && !periodo.endsWithIgnoreCase("C"))
+	{
+		cont_mp.put("Correo_electr_nico_Continua",correo);
+		cont_mp.put("Tel_fono_Continua",str_tel);
+		cont_mp.put("Destino_Lead","Diplomado");
+	}
+	else
+	{
+		cont_mp.put("Correo_electr_nico_personal",correo);
+		cont_mp.put("Phone",str_tel);
+		cont_mp.put("Destino_Lead","Carrera");
+	}
+	campana_m = IFNULL(contact.get("Campa_a_mercadeo"),"");
+	if(campana_m != "")
+	{
+		nom_camp = campana_m.get("name");
+		if(!nom_camp.containsIgnoreCase("PROYECCION") && !nom_camp.containsIgnoreCase("RECUNPENSA"))
+		{
+			cont_mp.put("Campa_a_mercadeo",camp_id);
+		}
+	}
+	cont_mp.put("Google_Click_ID",IFNULL(gclid,""));
+	// 	if(cont_creat > sixty)
+	// 	{
+	// 		cont_mp.put("Estado_del_Registro","Nueva oportunidad");
+	// 		cont_mp.put("Estado_de_Pionero","Remarketing Nuevo");
+	// 	}
+	info cont_mp;
+	//////
+	//ASIGNACION A COMUNICACIONES MERCADEO
+	//////
+	if(source == "PROMO_CUN")
+	{
+		cont_mp.put("Owner",4402173000315605001);
+	}
+	//////
+	//ASIGNACION A SEBASTIAN RODRIGUEZ HERNANDEZ - BACK
+	/////
+	else if(source == "EVENTO_BOYACA")
+	{
+		cont_mp.put("Owner",4402173000672832001);
+	}
+	try 
+	{
+		upd_cont = zoho.crm.updateRecord("Contacts",contact_id,cont_mp);
+		info "Update Contact: " + upd_cont;
+		info "Contact Map: " + cont_mp;
+		mp.put("Interesado actualizado: ",upd_cont);
+	}
+	catch (e)
+	{
+		mp.put("Error actualizar interesado: ",e);
+	}
+}
+else
+{
+	//////
+	//BUSQUEDA DEL LEAD POR CORREO
+	/////
+	criteria4 = "(Email:equals:" + correo + ")";
+	leads = zoho.crm.searchRecords("Leads",criteria4);
+	info "Leads: " + leads;
+	if(leads.size() > 0)
+	{
+		lead = leads.get(0);
+		lead_id = lead.getJSON("id");
+		lead_creat = lead.getJSON("Created_Time");
+		lead_sub_est = lead.getJSON("Sub_estado");
+		lead_etapa = lead.getJSON("Estado_del_Registro");
+		lead_mp = Map();
+		//lead_mp.put("Owner",4402173000315605001);
+		lead_mp.put("First_Name",nombres);
+		lead_mp.put("Last_Name",apellidos);
+		lead_mp.put("N_mero_de_identificaci_n1",numero_documento);
+		lead_mp.put("Ciudad_de_residencia1",codigo_departamento);
+		lead_mp.put("Programa_de_interes",program_id);
+		lead_mp.put("Ultimo_nivel_de_escolaridad",nivel_formacion);
+		lead_mp.put("Modalidad",modalidad);
+		lead_mp.put("Periodo",periodo);
+		if(periodo.containsIgnoreCase("C") && !periodo.endsWithIgnoreCase("C"))
+		{
+			lead_mp.put("Correo_electr_nico_Continua",correo);
+			lead_mp.put("Tel_fono_Continua",str_tel);
+			//lead_mp.put("Owner",4402173000315605001);
+			lead_mp.put("Destino_Lead","Diplomado");
+		}
+		else
+		{
+			lead_mp.put("Email",correo);
+			lead_mp.put("Phone",str_tel);
+			lead_mp.put("Destino_Lead","Carrera");
+			//lead_mp.put("Owner",4402173000315605001);
+		}
+		campana_m = IFNULL(lead.get("Campa_a_mercadeo"),"");
+		if(campana_m != "")
+		{
+			nom_camp = campana_m.get("name");
+			if(!nom_camp.containsIgnoreCase("PROYECCION") && !nom_camp.containsIgnoreCase("RECUNPENSA"))
+			{
+				lead_mp.put("Campa_a_mercadeo",camp_id);
+				//lead_mp.put("Owner",4402173000315605001);
+			}
+		}
+		lead_mp.put("Google_Click_ID",IFNULL(gclid,""));
+		orig_list = List();
+		orig_list.addAll(lead.getJSON("Form_Origen").toList(","));
+		orig_list.add(form_origen);
+		lead_mp.put("Form_Origen",orig_list);
+		//lead_mp.put("Owner",4402173000315605001);
+		if(!lead_sub_est.isNull() && lead_etapa != 'Abierto')
+		{
+			lead_mp.put("Estado_del_Registro","Abierto");
+			lead_mp.put("Lead_Status","Remarketing");
+		}
+		info lead_mp;
+		if(source == "PROMO_CUN")
+		{
+			lead_mp.put("Owner",4402173000315605001);
+		}
+		else if(source == "EVENTO_BOYACA")
+		{
+			lead_mp.put("Owner",4402173000672832001);
+		}
+		try 
+		{
+			upd_lead = zoho.crm.updateRecord("Leads",lead_id,lead_mp,{"trigger":{"workflow"}});
+			mp.put("Update Lead: ",upd_lead);
+		}
+		catch (e)
+		{
+			mp.put("Update Lead: ",e);
+		}
+	}
+	else
+	{
+		lead_mp = Map();
+		lead_mp.put("First_Name",nombres);
+		lead_mp.put("Last_Name",apellidos);
+		//lead_mp.put("Owner",4402173000315605001);
+		if(periodo.containsIgnoreCase("C") && !periodo.endsWithIgnoreCase("C"))
+		{
+			lead_mp.put("Correo_electr_nico_Continua",correo);
+			lead_mp.put("Tel_fono_Continua",str_tel);
+			//lead_mp.put("Owner",4402173000315605001);
+			lead_mp.put("Destino_Lead","Diplomado");
+		}
+		else
+		{
+			lead_mp.put("Email",correo);
+			lead_mp.put("Phone",str_tel);
+			lead_mp.put("Destino_Lead","Carrera");
+		}
+		lead_mp.put("N_mero_de_identificaci_n1",numero_documento);
+		if(source == "PROMO_CUN")
+		{
+			lead_mp.put("Owner",4402173000315605001);
+		}
+		else if(source == "EVENTO_BOYACA")
+		{
+			lead_mp.put("Owner",4402173000672832001);
+		}
+		lead_mp.put("Ciudad_de_residencia1",codigo_departamento);
+		lead_mp.put("Estado_del_Registro","Abierto");
+		lead_mp.put("Lead_Status","Nuevo / Sin Gestión");
+		lead_mp.put("Programa_de_interes",program_id);
+		lead_mp.put("Ultimo_nivel_de_escolaridad",nivel_formacion);
+		lead_mp.put("Modalidad",modalidad);
+		lead_mp.put("Periodo",periodo);
+		lead_mp.put("Destino_Lead","Carrera");
+		lead_mp.put("Campa_a_mercadeo",camp_id);
+		lead_mp.put("Google_Click_ID",IFNULL(gclid,""));
+		lead_mp.put("Validar_Telefono","YY");
+		orig_list = List();
+		orig_list.add(form_origen);
+		lead_mp.put("Form_Origen",orig_list);
+		try 
+		{
+			creatLead = zoho.crm.createRecord("Leads",lead_mp,{"trigger":{"workflow"},"lar_id":"4402173000567059750"});
+			mp.put("Create Lead: ",creatLead);
+		}
+		catch (e)
+		{
+			mp.put("Create Lead: ",e);
+		}
+	}
+	info "Lead Map: " + lead_mp;
+}
+info "Activo? " + activo;
+return mp;
+}
