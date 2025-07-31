@@ -1,0 +1,23 @@
+void automation.notas_req_personal(Int lead_id)
+{
+mp1 = Map();
+lead_info = zoho.crm.getRecordById("Leads",lead_id);
+lead_notes = zoho.crm.getRelatedRecords("Notes","requerimientos_Personal",lead_id);
+info lead_notes;
+titulo = lead_notes.getJSON("Note_Title");
+nota = lead_notes.getJSON("Note_Content");
+ind = 1;
+info "Nota: " + "" + nota;
+cont = "Nota: " + "" + nota;
+if(nota != null)
+{
+	mp1.put("Contenido_Notas",cont);
+	info mp1;
+	upt = zoho.crm.updateRecord("requerimientos_Personal",lead_id,mp1);
+	info upt;
+}
+else
+{
+	info "nada";
+}
+}
