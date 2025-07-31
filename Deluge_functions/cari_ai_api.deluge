@@ -1,0 +1,154 @@
+void automation.test_cari_hsm(String nombre,String phone,String correo,String documento,Int Id,String periodo)
+{
+//HECHO POR DAVID ROMERO UWU
+// Inicializar lista de números y parámetros	               
+/*
+                                          
+  _   ___      ___   _ 
+ | | | \ \ /\ / / | | |
+ | |_| |\ V  V /| |_| |
+  \__,_| \_/\_/  \__,_|
+                                            
+*/
+numeros = {phone};
+parametros = list();
+body = Map();
+//Obtener token de CARI
+response = invokeurl
+[
+	url :"https://cariai.com/hsmapi/createtoken"
+	type :POST
+	parameters:"{\"credentials\":\""}"
+	headers:{"Content-Type":"application/json"}
+];
+info response;
+carisec = response.get("cariSec");
+info carisec;
+//Obtener datos del lead desde Zoho CRM
+lead = zoho.crm.getRecordById("Leads",Id);
+programa = lead.get("Programa_de_interes");
+nom_prog = "";
+if(programa != null)
+{
+	nom_prog = programa.get("name");
+}
+// Validar si se obtuvo token correctamente
+if(carisec != null)
+{
+	parametros.add(nombre);
+	// [0] Nombre
+	parametros.add(nom_prog);
+	// [1] Programa
+	parametros.add(documento);
+	// [2] Cédula
+	parametros.add(correo);
+	// [3] Correo
+	parametros.add(phone);
+	// [4] Teléfono
+	//Clasificar Modalidad/Programa con lógica de campaña
+	camp = zoho.crm.getRecordById("Leads",Id);
+	//verificar si tiene campaña
+	if(camp.get("Campa_a_mercadeo") == null || camp.get("Campa_a_mercadeo").get("name") == "")
+	{
+		campa = "ORGANICO";
+	}
+	else
+	{
+		campa = camp.get("Campa_a_mercadeo").get("name");
+	}
+	texto = campa;
+	// Usamos la misma variable "texto"
+	// Variables auxiliares
+	segundo_item = "";
+	segundo = "";
+	mod = "";
+	// Si el texto NO es “ORGANICO”, extraer el segundo token
+	if(texto != "ORGANICO")
+	{
+		lista = texto.toList("-");
+		if(lista.size() > 1)
+		{
+			segundo_item = lista.get(1);
+			info "Token detectado: " + segundo_item;
+		}
+	}
+	// Clasificación cuando texto ≠ “ORGANICO”
+	if(segundo_item == "PRE")
+	{
+		segundo = "Pregrado";
+		mod = "Virtual";
+	}
+	else if(segundo_item == "ESP")
+	{
+		segundo = "Especialización";
+		mod = "Virtual";
+	}
+	// Clasificación cuando texto = “ORGANICO”
+	else if(texto == "ORGANICO")
+	{
+		if(periodo == "null" || periodo == "")
+		{
+			periodo = "25V04";
+		}
+		else
+		{
+			upperPeriodo = periodo.toUpperCase();
+			if(upperPeriodo.contains("V") && !upperPeriodo.endsWith("C"))
+			{
+				segundo = "Pregrado";
+				mod = "Virtual";
+			}
+			else if(upperPeriodo.endsWith("A") || upperPeriodo.endsWith("B") || upperPeriodo.endsWith("C") || upperPeriodo.endsWith("D"))
+			{
+				segundo = "Pregrado";
+				mod = "Presencial";
+			}
+			else if(upperPeriodo.contains("ET") || upperPeriodo.contains("ES") || upperPeriodo.contains("E1T"))
+			{
+				segundo = "Especialización";
+				mod = "Virtual";
+			}
+			else if(upperPeriodo.contains("C") && !upperPeriodo.endsWith("C"))
+			{
+				segundo = "Diplomado";
+				mod = "Virtual";
+			}
+			else if(upperPeriodo.contains("E"))
+			{
+				segundo = "Diplomado";
+				mod = "Virtual";
+			}
+		}
+	}
+	// Fallback por si nada coincide
+	if(segundo == "" || mod == "")
+	{
+		segundo = "Pregrado";
+		mod = "Virtual";
+	}
+	result = mod + "/" + segundo;
+	info result;
+	// Agregar resultado y campaña a los parámetros
+	parametros.add(result);
+	// [5] Modalidad/Tipo
+	parametros.add(campa);
+	// [6] Campaña
+	info parametros;
+	// Preparar cuerpo del mensaje
+	body.put("numbers",numeros);
+	body.put("parameters",parametros);
+	body.put("hsm","bienvenida_cun_aspirante_v12");
+	body.put("channel","WHATSAPP");
+	body.put("imageUrl","https://cari.ai/logic/repository/botFiles/691/3321/whatsApp_image_contact.jpeg");
+	body.put("mediaButtonCfg","[{'media_button_type':'POSTBACK', 'button_payload':'Si'},{'media_button_type':'POSTBACK', 'button_payload':'No'}]");
+	// Enviar mensaje HSM
+	envio = invokeurl
+	[
+		url :"https://cariai.com/hsmapi/sendhsm"
+		type :POST
+		parameters:body.toString()
+		headers:{"CariSec":carisec,"Content-Type":"application/json"}
+	];
+	info envio;
+}
+}
