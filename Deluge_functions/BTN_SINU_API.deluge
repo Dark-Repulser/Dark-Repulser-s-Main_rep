@@ -1,0 +1,201 @@
+string button.BTN_sinu_alumni(String id_fase)
+{
+//Funcion para enviar la oportunidad a Sinu desde un botón
+//
+//Desarrollador: David rm zohito 
+//Fecha: 19-may-2025
+//v1.1
+/*en el momento en que un asesor confirme que una FASE es totalmente válida 
+(verificando que sus datos estén completos: Con Gestor Comercial y un Programa 
+académico en estado Activo). 
+Esta invocación registra inmediatamente la información como un formulario SINU.  */
+//*******************************
+/* MUESTRA FORMULARIO SINU
+"idCliente":"APP_ZOHO",  //Identificacion de la Aplicación - Fija 
+"token":"PruebasZoho",  //Clave de Acceso de la Aplicación - Fija 
+numeroDocumento": "12345678",     // Deals.Documento_identidad 
+"idRegistro" : "1234",  // Deals.EntityId 
+"nombres": "Fulanito",    // Deals.First_Name 
+"apellidos": "De Tal",    // Deals.Last_name 
+"programa": "9999",   // Products.Secuencia asociado a Deals.ProgramId o Campo Programa 
+ "prospecto": "1234",  // Deals.contactId 
+"owner": "Dueño del Registro", // Owner.FullName 
+ "direccion": "Calle 10", // Deals.Direccion 
+ "email": "correo@edu.co", // Deals.Email 
+ "genero": "Masculino", // Deals.Genero 
+ "telefono": "321", // Deals.Phone 
+ "celular": "311111111", // Deals.Telefono_Celular 
+ "fechaNacimiento": "2000-08-25", // Deals.FechaNacimiento (texto con formato YYYY-MM-DD) 
+ "homologacion": "Normal", // Deals.Tipo_de_Inscripcion 
+ "creadoPor": "correo_creador@cun.edu.co", // Correo del Creador 
+ "gestorComercial": "Codigo Vendedor” // de la tabla de Gestores comerciales 
+*/
+//
+//Definicion de variables
+//url_sinu = "http://plataformas.cun.edu.co:8090/service_fases/serviceFases.php";
+//https://servicefases.cun.edu.co/serviceFases.php produccion
+//http://172.16.1.94:8080/sgacampus/"
+//http://190.184.202.251:8090/service_fases_test/ servifases pruebas
+//url_sinu = "https://servicefases.cun.edu.co/serviceFases.php";
+//url Prueba Carlitos
+//url_sinu = "http://pruebaszohosinu.cunapp.pro/serviceFases.php";
+url_sinu = "https://apizoho.cunapp.dev/";
+info_fase = zoho.crm.getRecordById("Deals",id_fase);
+//información de estudiante *****************
+//----------------------------------------------------------------------------------------------------------------------------------------------------------
+id_estudiante = info_fase.get("Nombre_del_ALUMNI").get("id");
+info_estudiante = zoho.crm.getRecordById("Alumni",id_estudiante);
+numeroDocumento = info_estudiante.get("N_mero_documento_de_identidad");
+idregistro = id_estudiante;
+nombres = info_estudiante.get("Name");
+apellidos = "N/A";
+direccion = info_estudiante.get("Direcci_n");
+email = info_estudiante.get("Email");
+genero = info_estudiante.get("G_nero");
+telefono = info_estudiante.get("N_mero_de_tel_fono_de_contacto");
+celular = telefono;
+fechaNacimiento = info_estudiante.get("Fecha_de_nacimiento");
+tipoid = info_estudiante.get("Tipo_de_documento_de_identidad");
+nacionalidad = info_estudiante.get("Nacionalidad");
+fechaexpedicion = info_estudiante.get("Fecha_de_expedici_n_documento");
+lugarexpedicion = info_estudiante.get("Lugar_de_expedici_n_de_documento");
+estadocivil = info_estudiante.get("Estado_civil");
+modalidad = info_estudiante.get("Modalidad");
+genero = info_estudiante.get("G_nero");
+// informacion de la Fase *************
+info "INFO FASE" + info_fase;
+owner = info_fase.get("Owner").get("id");
+reg_programa = info_fase.get("Programa");
+//capturamos el tipo de homologacion del formulario de fase
+reg_homologacion = info_fase.get("homologa");
+//Capturamosel id de la ciudad de nacimiento del formulario de fases 
+reg_ciudadnacimiento = info_fase.get("Ciudad_de_nacimiento");
+//Capturamosel id de la ciudad de residencia del formulario de fases 
+reg_ciudadresidencia = info_fase.get("Ciudad_de_residencia");
+reg_gestor = info_fase.get("Gestor_Comercial");
+if(nombres != null && numeroDocumento != null)
+{
+	//if(nombres != null && apellidos != null && numeroDocumento != null)
+	if(reg_programa != null)
+	{
+		id_programa = reg_programa.get("id");
+		id_homologa = reg_homologacion.get("id");
+		id_ciudadnacimiento = reg_ciudadnacimiento.get("id");
+		id_ciudadresidencia = reg_ciudadresidencia.get("id");
+		info "INFO PROGRAMA" + id_programa;
+		info_programa = zoho.crm.getRecordById("Products",id_programa);
+		programa = info_programa.get("Product_Code");
+		info_ciudad_nacimiento = zoho.crm.getRecordById("geopolitica",id_ciudadnacimiento);
+		ciudadnacimiento = info_ciudad_nacimiento.get("ID_GEOPOLITICA");
+		info_ciudad_residencia = zoho.crm.getRecordById("geopolitica",id_ciudadresidencia);
+		ciudadresidencia = info_ciudad_residencia.get("ID_GEOPOLITICA");
+		//capturamos el id de modulo de homologacion
+		info_homologacion = zoho.crm.getRecordById("mod_homologacion",id_homologa);
+		//CAPTURAMOS EL ID DE TRANSFERENCIA A SINU
+		homologacion = info_homologacion.get("IDSINU");
+		//info_geopolitica = zoho.crm.getRecordById("geopolitica",id_Ciudad_de_residencia);
+		//geopolitica = info_geopolitica.get("COD_GEOPOLITICA");
+		//comentarea jlmc 10/10/22
+		//id_homologa = info_fase.get("homologa");
+		email_creadopor = info_fase.get("Created_By").get("email");
+		id_gestorcomercial = info_fase.get("Gestor_Comercial").get("id");
+		info_gc = zoho.crm.getRecordById("Gestores_Comerciales",id_gestorcomercial);
+		codigo_gc = info_gc.get("Codigo_Vendedor");
+		//----------------------------------------------------------------------------------------------------------------------------------------------------------
+		// 		// 		owner_name = info_fase.get("Owner").get("name");
+		// 		// 		registro_oport = id_fase;
+		// 		// 		if(owner_name.containsIgnoreCase("telecampus"))
+		// 		// 		{
+		// 		// 			registro_oport = id_fase + "01";
+		// 		// 		}
+		// 		// 		else if(owner_name.containsIgnoreCase("vinculaciones"))
+		// 		// 		{
+		// 		// 			registro_oport = id_fase + "02";
+		// 		// 		}
+		// 		// 		else if(owner_name.containsIgnoreCase("contact"))
+		// 		// 		{
+		// 		// 			registro_oport = id_fase + "03";
+		// 		// 		}
+		// 		//Construccion Mapa 	//ASIGNAMOS EL VALOR A ENVIAR A SINU
+		map_sinu = Map();
+		map_sinu.put("idCliente","");
+		map_sinu.put("token","");
+		map_sinu.put("numeroDocumento",numeroDocumento);
+		map_sinu.put("idRegistro",id_fase);
+		map_sinu.put("nombres",nombres);
+		map_sinu.put("apellidos",apellidos);
+		map_sinu.put("programa",programa);
+		map_sinu.put("prospecto",id_estudiante);
+		map_sinu.put("owner",owner);
+		map_sinu.put("direccion",direccion);
+		map_sinu.put("email",email);
+		map_sinu.put("genero",genero);
+		map_sinu.put("telefono",telefono);
+		map_sinu.put("celular",celular);
+		map_sinu.put("fechaNacimiento",fechaNacimiento);
+		map_sinu.put("homologacion",homologacion);
+		map_sinu.put("tip_inscripcion",id_homologa);
+		map_sinu.put("tipoid",tipoid);
+		map_sinu.put("nacionalidad",nacionalidad);
+		map_sinu.put("fechaexpedicion",fechaexpedicion);
+		map_sinu.put("estadocivil",estadocivil);
+		map_sinu.put("creadoPor",email_creadopor);
+		map_sinu.put("gestorComercial",codigo_gc);
+		map_sinu.put("ciudadnacimiento",ciudadnacimiento);
+		map_sinu.put("ciudad_nacimiento",id_ciudadnacimiento);
+		map_sinu.put("ciudadresidencia",ciudadresidencia);
+		map_sinu.put("ciudad_residencia",id_ciudadresidencia);
+		map_sinu.put("lugarexpedicion",lugarexpedicion);
+		//map_formulario = Map();
+		//map_formulario = {"numeroDocumento":numeroDocumento,"idRegistro":idregistro,"nombres":nombres,"apellidos":apellidos,"programaZoho":programa,"owner":owner,"direccion":direccion,"email":email,"genero":genero,"telefono":telefono,"fechaNacimiento":fechaNacimiento,"homologacion":homologacion,"gestorComercial":gestor_ventas,"periodo":periodo,"regional":regional,"sedeJornada":sede,"modalidad":modalidad,"origen":"ZOHO-NUEVO"};
+		//map_sinu.put("formularioExteno",map_formulario);
+		info "****MAPA+++++++++*";
+		//esta es la instruccion que se necesita para enviar la ifno a la url
+		myip = invokeurl
+		[
+			url :"http://bot.whatismyipaddress.com/"
+			type :GET
+		];
+		info "IP origen:" + myip + "  " + map_sinu;
+		info "******FIN MAPA+++++++++++**";
+		mapa_sinu = map_sinu.toString();
+		// llamado Websrevice SINU
+		resultado_sinu = invokeurl
+		[
+			url :url_sinu
+			type :POST
+			parameters:mapa_sinu
+			content-type:"application/json"
+		];
+		info "Respuesta Sinu: " + resultado_sinu;
+		mensaje_respuesta1 = "****Mapa: " + mapa_sinu + "*******Info Estudiante:" + info_estudiante + "**********Info Fase:" + info_fase + "**********Respuesta Sinu: " + resultado_sinu;
+		info "------------------------------ANTES: " + mensaje_respuesta1;
+		mensaje_respuesta1 = "********************Enviado a Sinu: " + mapa_sinu + "*****************Respuesta Sinu: " + resultado_sinu;
+		info "------------------------------DESPUES: " + mensaje_respuesta1;
+	}
+	else
+	{
+		mensaje_respuesta1 = "No es posible procesar la solicitud. Faltan Datos (Programa y/o Gestor Comercial)";
+	}
+}
+else
+{
+	mensaje_respuesta1 = "No es posible procesar la solicitud. La Ficha de ESTUDIANTE no tiene informacion mínima de Nombre/Apellido/Numero de Documento";
+}
+info "-----------------------FINAL: " + mensaje_respuesta1;
+params = Map();
+params.put("auth_type","oauth");
+params.put("oport_id",id_fase);
+params.put("in_id",id_estudiante);
+params.put("progr_id",id_programa);
+params.put("geo_id",id_ciudadnacimiento);
+ctayuda = invokeurl
+[
+	url :"https://www.zohoapis.com/crm/v2/functions/ctayuda/actions/execute"
+	type :POST
+	parameters:params
+	connection:"zohocrmconnection"
+];
+info ctayuda;
+return mensaje_respuesta1;
+}
