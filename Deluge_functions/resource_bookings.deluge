@@ -1,0 +1,37 @@
+string resource_bookings(string id_resource, string customer_info)
+{
+//hecho por david romero uwu
+//con mucho amor
+	/*
+  _____          _____  _  __     _____  ______ _____  _    _ _       _____ ______ _____  
+ |  __ \   /\   |  __ \| |/ /    |  __ \|  ____|  __ \| |  | | |     / ____|  ____|  __ \ 
+ | |  | | /  \  | |__) | ' /_____| |__) | |__  | |__) | |  | | |    | (___ | |__  | |__) |
+ | |  | |/ /\ \ |  _  /|  <______|  _  /|  __| |  ___/| |  | | |     \___ \|  __| |  _  / 
+ | |__| / ____ \| | \ \| . \     | | \ \| |____| |    | |__| | |____ ____) | |____| | \ \ 
+ |_____/_/    \_\_|  \_\_|\_\    |_|  \_\______|_|     \____/|______|_____/|______|_|  \_\
+                                                                                          
+                                                                                          
+                                                                                          
+	*/
+//mapa para la info
+mp1 = customer_info;
+info mp1;
+actividad = mp1.get("Actividad a realizar");
+info actividad;
+fecha = mp1.get("Fecha");
+info fecha;
+visitantes = mp1.get("Visitantes externos");
+info visitantes;
+Area = mp1.get("Área solicitante");
+Nombre_visitante = mp1.get("Nombre de Visitantes - Numero de identificación de visitantes");
+info Nombre_visitante;
+n_url = "https://www.zohoapis.com/bookings/v1/json/resources?resource_id=" + id_resource;
+response = invokeurl
+[
+	url :n_url
+	type :GET
+	connection:"booking"
+];
+nombre = response.getJSON("response").getJSON("returnvalue").getJSON("data").getJSON("name");
+return nombre;
+}
