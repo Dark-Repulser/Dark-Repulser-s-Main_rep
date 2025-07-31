@@ -1,0 +1,7 @@
+list jsonarraytolist(String exisStr, String newStr)
+{
+jsonArray = list();
+jsonArray.addAll(exisStr.toList());
+jsonArray.addAll(newStr.toList());
+return jsonArray;
+}
