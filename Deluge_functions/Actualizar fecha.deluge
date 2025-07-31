@@ -1,0 +1,31 @@
+// Actualizar campo en Zoho Desk
+//made by david romero zohito uwu
+/*
+  _____          _____  _  __     _____  ______ _____  _    _ _       _____ ______ _____  
+ |  __ \   /\   |  __ \| |/ /    |  __ \|  ____|  __ \| |  | | |     / ____|  ____|  __ \ 
+ | |  | | /  \  | |__) | ' /_____| |__) | |__  | |__) | |  | | |    | (___ | |__  | |__) |
+ | |  | |/ /\ \ |  _  /|  <______|  _  /|  __| |  ___/| |  | | |     \___ \|  __| |  _  / 
+ | |__| / ____ \| | \ \| . \     | | \ \| |____| |    | |__| | |____ ____) | |____| | \ \ 
+ |_____/_/    \_\_|  \_\_|\_\    |_|  \_\______|_|     \____/|______|_____/|______|_|  \_\                                                                                                                                                                            
+*/
+//con mucho amor <3
+orgID = 707762349;
+mp1 = Map();
+// Obtener los datos del ticket
+ticketData = zoho.desk.getRecordById(orgID,"tickets",id);
+info ticketData;
+customFields = ticketData.getJSON("customFields");
+ticket = customFields.getJSON("Escalado por");
+info ticketData;
+if(ticket != null && ticket != "")
+{
+	hora = zoho.currenttime;
+	info hora;
+	info "No está vacío";
+	UPD = zoho.desk.update(orgID,"tickets",id,{"cf":{"cf_fecha_escalado_por":hora}});
+	info UPD;
+}
+else
+{
+	info "El campo está vacío o es nulo";
+}
