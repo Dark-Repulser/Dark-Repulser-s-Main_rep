@@ -1,0 +1,62 @@
+void automation.ctAyudaDiplomados(Int dipl_id,Int progr_id)
+{
+programa = zoho.crm.getRecordById("Products",progr_id);
+diplomado = zoho.crm.getRecordById("Estudiantes_Diplomados",dipl_id);
+body = {"username":"","password":""};
+response = invokeurl
+[
+	url :"https://app360.cunapp.pro/api/v1/auth/login"
+	type :POST
+	parameters:body
+];
+info response;
+token = response.get("access_token");
+headers = Map();
+headers.put("Authorization","Bearer " + token);
+info headers;
+dipl_owner = diplomado.get("Owner").get("name");
+ind = find(dipl_owner," ");
+fuerza = dipl_owner.subString(0,ind);
+cod_fuerza = 0;
+if(fuerza.equalsIgnoreCase("Edu_interna"))
+{
+	cod_fuerza = 11;
+}
+genero = diplomado.get("Genero");
+body2 = Map();
+body2.put("documentNumber",toNumber(IFNULL(diplomado.get("N_mero_de_identificaci_n"),0)));
+body2.put("phaseId",toString(IFNULL(dipl_id,0)));
+body2.put("firstName",IFNULL(diplomado.get("Name"),""));
+body2.put("lastName","NA");
+body2.put("program",IFNULL(programa.get("Malla"),""));
+body2.put("studentId",toString(IFNULL(dipl_id,0)));
+body2.put("owner",toString(IFNULL(diplomado.get("Owner").get("id"),0)));
+body2.put("address","NA");
+body2.put("email",IFNULL(diplomado.get("Email"),diplomado.get("Correo_electr_nico_institucional")));
+body2.put("gender",genero);
+body2.put("phone",IFNULL(diplomado.get("Tel_fono"),0));
+body2.put("mobile","NA");
+body2.put("birthDate","NA");
+body2.put("idType",IFNULL(diplomado.get("Tipo_de_identificaci_n"),""));
+body2.put("nationality","Colombiana");
+body2.put("issuanceDate","NA");
+body2.put("maritalStatus","NA");
+body2.put("issuancePlace","NA");
+body2.put("birthCity","NA");
+body2.put("residenceCity","NA");
+body2.put("salesName",IFNULL(fuerza,""));
+body2.put("salesCode",IFNULL(cod_fuerza,""));
+body2.put("ownerName",IFNULL(diplomado.get("Owner").get("name"),""));
+body2.put("academicPeriod",IFNULL(diplomado.get("Periodo_del_diplomado"),""));
+body2.put("isCreditApplicable",0);
+info "BODY: " + body2;
+response2 = invokeurl
+[
+	url :"https://app360.cunapp.pro/api/v1/fintech/student-sales-representative"
+	type :POST
+	parameters:body2.toString()
+	headers:headers
+	content-type:"application/json"
+];
+info response2;
+}
