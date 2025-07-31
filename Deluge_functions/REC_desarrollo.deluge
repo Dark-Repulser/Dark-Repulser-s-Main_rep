@@ -1,0 +1,43 @@
+string reCUNpensa(string Apellidos, string Correo, string Nombre, string tel, string Modalidad, string Periodo, string Num_documento, string Referido, string Num_documento_referido, string Form_origen, string Ciudad_residencia, string Campa_a_mercadeo, string UTM_CAMP)
+{
+//funcion creada por david romero Zoho :3
+/*
+  _____          _____  _  __     _____  ______ _____  _    _ _       _____ ______ _____  
+ |  __ \   /\   |  __ \| |/ /    |  __ \|  ____|  __ \| |  | | |     / ____|  ____|  __ \ 
+ | |  | | /  \  | |__) | ' /_____| |__) | |__  | |__) | |  | | |    | (___ | |__  | |__) |
+ | |  | |/ /\ \ |  _  /|  <______|  _  /|  __| |  ___/| |  | | |     \___ \|  __| |  _  / 
+ | |__| / ____ \| | \ \| . \     | | \ \| |____| |    | |__| | |____ ____) | |____| | \ \ 
+ |_____/_/    \_\_|  \_\_|\_\    |_|  \_\______|_|     \____/|______|_____/|______|_|  \_\
+                                                                                          
+                                                                                          
+*/
+//param en list por el tipo de campo(JSONarray)
+lst = list();
+lst.add(Form_origen);
+info lst;
+//mapeo de todos los campos del form--------------------
+mp_lead = Map();
+mp_lead.put("Last_Name",Apellidos);
+mp_lead.put("Email",Correo);
+mp_lead.put("First_Name",Nombre);
+mp_lead.put("Phone",tel);
+mp_lead.put("Modalidad",Modalidad);
+mp_lead.put("Periodo",Periodo);
+mp_lead.put("N_mero_de_identificaci_n1",Num_documento);
+mp_lead.put("Referido",Referido);
+mp_lead.put("N_mero_de_documento_referido",Num_documento_referido);
+mp_lead.put("Form_Origen",lst);
+mp_lead.put("Ciudad_de_residencia1",Ciudad_residencia);
+mp_lead.put("Campa_a_mercadeo",Campa_a_mercadeo);
+mp_lead.put("xd",UTM_CAMP);
+info mp_lead;
+//Verificacion del mapa del mapeo que no este vacio
+if(mp_lead != null)
+{
+	//creacion de Lead en el modulo de posible cliente-------------------
+	CREAR_CRM = zoho.crm.createRecord("Leads",mp_lead,{"trigger":{"workflow"}});
+	info CREAR_CRM;
+	return CREAR_CRM;
+}
+return "No se creo:";
+}
