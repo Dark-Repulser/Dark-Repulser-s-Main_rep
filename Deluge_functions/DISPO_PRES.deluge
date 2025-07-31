@@ -1,0 +1,39 @@
+org_id = "707762349";
+tk_in = zoho.desk.getRecordById(org_id,"tickets",tk);
+prop_id = tk_in.get("assigneeId");
+info prop_id;
+info tk_in;
+valor = val.toNumber();
+// IDs
+fabian_id = "474709000973649569";
+compras_id = "474709000548859083";
+// Solo reasignar a Fabían si NO lo tiene ni él ni Compras actualmente
+if(prop_id != fabian_id && prop_id != compras_id)
+{
+	if(valor >= 50000000)
+	{
+		mp1 = Map();
+		mp1.put("assigneeId",fabian_id);
+		// Asignar a Fabían
+		upt = zoho.desk.update(org_id,"tickets",tk,mp1);
+		info upt;
+	}
+	else
+	{
+		info "nada";
+	}
+}
+else
+{
+	info "Ya está en Fabían o Compras, no se reasigna automáticamente";
+}
+//>>>>>>>>>>>>>>>>>>>>>MADE BY DRSM<<<<<<<<<<<<<<<<<<<<
+
+/*
+  _____          _____  _  __     _____  ______ _____  _    _ _       _____ ______ _____  
+ |  __ \   /\   |  __ \| |/ /    |  __ \|  ____|  __ \| |  | | |     / ____|  ____|  __ \ 
+ | |  | | /  \  | |__) | ' /_____| |__) | |__  | |__) | |  | | |    | (___ | |__  | |__) |
+ | |  | |/ /\ \ |  _  /|  <______|  _  /|  __| |  ___/| |  | | |     \___ \|  __| |  _  / 
+ | |__| / ____ \| | \ \| . \     | | \ \| |____| |    | |__| | |____ ____) | |____| | \ \ 
+ |_____/_/    \_\_|  \_\_|\_\    |_|  \_\______|_|     \____/|______|_____/|______|_|  \_\                                                                                                                                                                            
+*/
