@@ -1,0 +1,19 @@
+string button.boton_fecha_matriculado(String id)
+{
+mp1 = Map();
+traer = zoho.crm.getRecordById("Deals",id).get("Stage");
+info traer;
+if(traer != "Matriculado")
+{
+	mp1.put("Closing_Date",zoho.currentdate);
+	mp1.put("Stage"," Matriculado");
+	info mp1;
+	actualizar = zoho.crm.updateRecord("Deals",id,mp1,{"trigger":{"workflow"}});
+	info actualizar;
+	return "la fase es ahora 'MATRICULADO', " + mp1;
+}
+else
+{
+	return "El registro ya esta 'MATRICULADO' ";
+}
+}
