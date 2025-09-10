@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+    <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f7f9fc;
+      color: #333;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      color: #4A6CF7;
+    }
+    .field {
+      margin-bottom: 15px;
+    }
+    .field strong {
+      display: inline-block;
+      width: 120px;
+      color: #222;
+    }
+    .body-text {
+      background: #f1f5ff;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Información Recibida</h2>
+
+    <div class="body-text">
+      ${webhookTrigger.payload.Body}
+    </div>
+  </div>
+</body>
+</html>
